@@ -27,7 +27,7 @@ claude
 git clone https://github.com/pautodo/dotfiles-mcp.git ~/dotfiles-mcp
 
 # Run the install script (will prompt for AWS SSO login)
-~/dotfiles-mcp/dotfiles-mcp/install.sh
+~/dotfiles-mcp/install.sh
 
 # Set Slack token (if not in environment)
 export SLACK_BOT_TOKEN='xoxb-your-token'
