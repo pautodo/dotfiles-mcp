@@ -14,7 +14,7 @@ echo "========================================"
 echo ""
 
 # Step 1: Install AWS CLI if not present
-echo "[1/5] Checking AWS CLI..."
+echo "[1/6] Checking AWS CLI..."
 if ! command -v aws &> /dev/null; then
     echo "  Installing AWS CLI..."
     cd /tmp
@@ -29,7 +29,7 @@ else
 fi
 
 # Step 2: Configure AWS SSO profile
-echo "[2/5] Configuring AWS SSO profile..."
+echo "[2/6] Configuring AWS SSO profile..."
 AWS_CONFIG_FILE="$HOME/.aws/config"
 mkdir -p "$HOME/.aws"
 if ! grep -q "\[profile voodoo-adn-prod\]" "$AWS_CONFIG_FILE" 2>/dev/null; then
@@ -48,7 +48,7 @@ else
 fi
 
 # Step 3: Setup Athena MCP virtual environment
-echo "[3/5] Setting up Athena MCP..."
+echo "[3/6] Setting up Athena MCP..."
 ATHENA_DIR="$SCRIPT_DIR/athena-mcp"
 ATHENA_VENV="$ATHENA_DIR/venv"
 if [ -d "$ATHENA_DIR" ]; then
@@ -62,7 +62,7 @@ else
 fi
 
 # Step 4: Setup Slack MCP virtual environment
-echo "[4/5] Setting up Slack MCP..."
+echo "[4/6] Setting up Slack MCP..."
 SLACK_DIR="$SCRIPT_DIR/slack-mcp"
 SLACK_VENV="$SLACK_DIR/venv"
 if [ -d "$SLACK_DIR" ]; then
@@ -77,7 +77,7 @@ else
 fi
 
 # Step 5: Create global Claude MCP configuration
-echo "[5/5] Creating global MCP configuration..."
+echo "[5/6] Creating global MCP configuration..."
 mkdir -p "$CLAUDE_CONFIG_DIR"
 
 cat > "$CLAUDE_CONFIG_DIR/settings.local.json" << EOF
@@ -104,19 +104,25 @@ cat > "$CLAUDE_CONFIG_DIR/settings.local.json" << EOF
 EOF
 echo "  Created $CLAUDE_CONFIG_DIR/settings.local.json"
 
+# Step 6: AWS SSO Login
+echo "[6/6] AWS SSO Login..."
+echo ""
+echo "Opening browser for AWS authentication..."
+aws sso login --profile voodoo-adn-prod || {
+    echo ""
+    echo "  AWS SSO login skipped or failed."
+    echo "  Run manually later: aws sso login --profile voodoo-adn-prod"
+}
+
 echo ""
 echo "========================================"
 echo "  Setup Complete!"
 echo "========================================"
 echo ""
-echo "Before using Claude with MCP servers:"
-echo ""
-echo "  1. AWS Athena - Login to AWS SSO:"
-echo "     aws sso login --profile voodoo-adn-prod"
-echo ""
-echo "  2. Slack - Set your bot token (or add to Codespaces secrets):"
-echo "     export SLACK_BOT_TOKEN='xoxb-your-token'"
-echo ""
-echo "  3. Start Claude Code in any project:"
-echo "     claude"
+if [ -z "$SLACK_BOT_TOKEN" ]; then
+    echo "Note: SLACK_BOT_TOKEN not set. Add it to Codespaces Secrets"
+    echo "or run: export SLACK_BOT_TOKEN='xoxb-your-token'"
+    echo ""
+fi
+echo "Start Claude Code: claude"
 echo ""

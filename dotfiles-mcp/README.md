@@ -14,10 +14,9 @@ MCP (Model Context Protocol) servers for Claude Code: **AWS Athena** and **Slack
 
 **In each new Codespace:**
 
-The install script runs automatically. Just authenticate with AWS:
+The install script runs automatically and prompts you for AWS SSO login (opens browser). Once authenticated:
 
 ```bash
-aws sso login --profile voodoo-adn-prod
 claude
 ```
 
@@ -27,11 +26,10 @@ claude
 # Clone the repo
 git clone https://github.com/pautodo/dotfiles-mcp.git ~/dotfiles-mcp
 
-# Run the install script
+# Run the install script (will prompt for AWS SSO login)
 ~/dotfiles-mcp/dotfiles-mcp/install.sh
 
-# Authenticate
-aws sso login --profile voodoo-adn-prod
+# Set Slack token (if not in environment)
 export SLACK_BOT_TOKEN='xoxb-your-token'
 
 # Start Claude
