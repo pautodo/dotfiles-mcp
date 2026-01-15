@@ -1,3 +1,7 @@
 # Virtual environments (created by setup scripts)
 */venv/
 */__pycache__/
+
+# MCP configuration (generated with machine-specific paths)
+mcp.json
+.mcp.json

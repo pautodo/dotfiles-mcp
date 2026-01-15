@@ -6,7 +6,6 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-CLAUDE_CONFIG_DIR="$HOME/.claude"
 
 echo "========================================"
 echo "  MCP Servers Setup for Claude Code"
@@ -61,11 +60,11 @@ else
     echo "  Slack MCP directory not found, skipping"
 fi
 
-# Step 4: Create global Claude MCP configuration
-echo "[4/4] Creating global MCP configuration..."
-mkdir -p "$CLAUDE_CONFIG_DIR"
+# Step 4: Create MCP configuration and deploy to workspaces
+echo "[4/4] Creating MCP configuration..."
 
-cat > "$CLAUDE_CONFIG_DIR/settings.local.json" << EOF
+# Create the mcp.json template in dotfiles directory
+cat > "$SCRIPT_DIR/mcp.json" << EOF
 {
   "mcpServers": {
     "athena": {
@@ -87,7 +86,18 @@ cat > "$CLAUDE_CONFIG_DIR/settings.local.json" << EOF
   }
 }
 EOF
-echo "  Created $CLAUDE_CONFIG_DIR/settings.local.json"
+echo "  Created $SCRIPT_DIR/mcp.json"
+
+# Auto-copy to all workspace directories (for Codespaces)
+if [ -d "/workspaces" ]; then
+    for workspace in /workspaces/*/; do
+        # Skip the .codespaces directory
+        if [[ "$workspace" != *".codespaces"* ]]; then
+            cp "$SCRIPT_DIR/mcp.json" "${workspace}.mcp.json" 2>/dev/null && \
+            echo "  Copied to ${workspace}.mcp.json"
+        fi
+    done
+fi
 
 # Create marker file to indicate dotfiles installation is complete
 touch "$HOME/.dotfiles_installed"
@@ -99,8 +109,6 @@ echo "========================================"
 echo ""
 echo "Before using Athena MCP, authenticate with AWS:"
 echo "  aws sso login --profile voodoo-adn-prod"
-echo ""
-echo "(Requires AWS CLI - install with: curl -s https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -o awscliv2.zip && unzip -q awscliv2.zip && sudo ./aws/install)"
 echo ""
 if [ -z "$SLACK_BOT_TOKEN" ]; then
     echo "Note: SLACK_BOT_TOKEN not set. Add it to Codespaces Secrets"
