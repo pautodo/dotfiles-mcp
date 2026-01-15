@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "athena": {
+      "command": "/home/codespace/dotfiles-mcp/athena-mcp/venv/bin/python",
+      "args": ["/home/codespace/dotfiles-mcp/athena-mcp/server.py"],
+      "env": {
+        "AWS_PROFILE_NAME": "voodoo-adn-prod",
+        "AWS_REGION_NAME": "eu-west-1"
+      }
+    },
+    "slack": {
+      "command": "/home/codespace/dotfiles-mcp/slack-mcp/venv/bin/python",
+      "args": ["/home/codespace/dotfiles-mcp/slack-mcp/server.py"],
+      "env": {
+        "SLACK_BOT_TOKEN": "${SLACK_BOT_TOKEN}",
+        "SLACK_CHANNEL_ALLOWLIST": ""
+      }
+    }
+  }
+}
