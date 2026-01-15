@@ -13,23 +13,8 @@ echo "  MCP Servers Setup for Claude Code"
 echo "========================================"
 echo ""
 
-# Step 1: Install AWS CLI if not present
-echo "[1/6] Checking AWS CLI..."
-if ! command -v aws &> /dev/null; then
-    echo "  Installing AWS CLI..."
-    cd /tmp
-    curl -s "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-    unzip -o -q awscliv2.zip
-    sudo ./aws/install --update 2>/dev/null || sudo ./aws/install
-    rm -rf aws awscliv2.zip
-    cd "$SCRIPT_DIR"
-    echo "  AWS CLI installed"
-else
-    echo "  AWS CLI already installed"
-fi
-
-# Step 2: Configure AWS SSO profile
-echo "[2/6] Configuring AWS SSO profile..."
+# Step 1: Configure AWS SSO profile
+echo "[1/4] Configuring AWS SSO profile..."
 AWS_CONFIG_FILE="$HOME/.aws/config"
 mkdir -p "$HOME/.aws"
 if ! grep -q "\[profile voodoo-adn-prod\]" "$AWS_CONFIG_FILE" 2>/dev/null; then
@@ -47,8 +32,8 @@ else
     echo "  AWS SSO profile already configured"
 fi
 
-# Step 3: Setup Athena MCP virtual environment
-echo "[3/6] Setting up Athena MCP..."
+# Step 2: Setup Athena MCP virtual environment
+echo "[2/4] Setting up Athena MCP..."
 ATHENA_DIR="$SCRIPT_DIR/athena-mcp"
 ATHENA_VENV="$ATHENA_DIR/venv"
 if [ -d "$ATHENA_DIR" ]; then
@@ -61,8 +46,8 @@ else
     echo "  Athena MCP directory not found, skipping"
 fi
 
-# Step 4: Setup Slack MCP virtual environment
-echo "[4/6] Setting up Slack MCP..."
+# Step 3: Setup Slack MCP virtual environment
+echo "[3/4] Setting up Slack MCP..."
 SLACK_DIR="$SCRIPT_DIR/slack-mcp"
 SLACK_VENV="$SLACK_DIR/venv"
 if [ -d "$SLACK_DIR" ]; then
@@ -76,8 +61,8 @@ else
     echo "  Slack MCP directory not found, skipping"
 fi
 
-# Step 5: Create global Claude MCP configuration
-echo "[5/6] Creating global MCP configuration..."
+# Step 4: Create global Claude MCP configuration
+echo "[4/4] Creating global MCP configuration..."
 mkdir -p "$CLAUDE_CONFIG_DIR"
 
 cat > "$CLAUDE_CONFIG_DIR/settings.local.json" << EOF
@@ -104,20 +89,18 @@ cat > "$CLAUDE_CONFIG_DIR/settings.local.json" << EOF
 EOF
 echo "  Created $CLAUDE_CONFIG_DIR/settings.local.json"
 
-# Step 6: AWS SSO Login
-echo "[6/6] AWS SSO Login..."
-echo ""
-echo "Opening browser for AWS authentication..."
-aws sso login --profile voodoo-adn-prod || {
-    echo ""
-    echo "  AWS SSO login skipped or failed."
-    echo "  Run manually later: aws sso login --profile voodoo-adn-prod"
-}
+# Create marker file to indicate dotfiles installation is complete
+touch "$HOME/.dotfiles_installed"
 
 echo ""
 echo "========================================"
 echo "  Setup Complete!"
 echo "========================================"
+echo ""
+echo "Before using Athena MCP, authenticate with AWS:"
+echo "  aws sso login --profile voodoo-adn-prod"
+echo ""
+echo "(Requires AWS CLI - install with: curl -s https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -o awscliv2.zip && unzip -q awscliv2.zip && sudo ./aws/install)"
 echo ""
 if [ -z "$SLACK_BOT_TOKEN" ]; then
     echo "Note: SLACK_BOT_TOKEN not set. Add it to Codespaces Secrets"
