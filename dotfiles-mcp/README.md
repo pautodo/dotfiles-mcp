@@ -1,37 +1,44 @@
 # MCP Servers Dotfiles
 
-MCP (Model Context Protocol) servers for Claude Code, automatically configured in GitHub Codespaces.
+MCP (Model Context Protocol) servers for Claude Code: **AWS Athena** and **Slack**.
 
-## Quick Start
+## Setup
 
-### One-Time Setup (GitHub Settings)
+### Option 1: GitHub Codespaces (Automatic)
 
+**One-time setup in GitHub:**
 1. Go to [GitHub Settings > Codespaces](https://github.com/settings/codespaces)
 2. Under "Dotfiles", check **"Automatically install dotfiles"**
 3. Select this repository
-4. Add your Slack token to **Codespaces Secrets**:
-   - Name: `SLACK_BOT_TOKEN`
-   - Value: `xoxb-your-token`
+4. Add `SLACK_BOT_TOKEN` to **Codespaces Secrets** (value: `xoxb-...`)
 
-### In Each New Codespace
+**In each new Codespace:**
 
-Run one command to set everything up:
-
-```bash
-~/dotfiles-mcp/install.sh
-```
-
-Then authenticate with AWS:
+The install script runs automatically. Just authenticate with AWS:
 
 ```bash
 aws sso login --profile voodoo-adn-prod
-```
-
-Start Claude:
-
-```bash
 claude
 ```
+
+### Option 2: Local Installation
+
+```bash
+# Clone the repo
+git clone https://github.com/pautodo/dotfiles-mcp.git ~/dotfiles-mcp
+
+# Run the install script
+~/dotfiles-mcp/dotfiles-mcp/install.sh
+
+# Authenticate
+aws sso login --profile voodoo-adn-prod
+export SLACK_BOT_TOKEN='xoxb-your-token'
+
+# Start Claude
+claude
+```
+
+**Requirements:** Python 3.10+, Claude Code CLI
 
 ## Included MCP Servers
 
@@ -58,9 +65,9 @@ The install script creates `~/.claude/settings.local.json` with the MCP server c
 
 ### Environment Variables
 
-| Variable | Where to Set | Description |
-|----------|--------------|-------------|
-| `SLACK_BOT_TOKEN` | Codespaces Secrets | Slack bot OAuth token (xoxb-...) |
+| Variable | Description |
+|----------|-------------|
+| `SLACK_BOT_TOKEN` | Slack bot OAuth token (xoxb-...). Set in Codespaces Secrets or export locally. |
 
 ### Creating a Slack App
 
@@ -80,4 +87,4 @@ aws sso login --profile voodoo-adn-prod
 Add the bot to the channel: `/invite @bot-name`
 
 ### MCP servers not loading
-Restart Claude Code after running `install.sh`
+Restart Claude Code after installation.
