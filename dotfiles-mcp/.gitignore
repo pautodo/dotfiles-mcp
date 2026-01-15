@@ -1,0 +1,3 @@
+# Virtual environments (created by setup scripts)
+*/venv/
+*/__pycache__/
